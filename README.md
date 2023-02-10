@@ -1,1 +1,1 @@
-To run the project, simply open the app. I've included a sample API.
+To run the project, simply `npm install` and `npm start`. I've included a sample API.
