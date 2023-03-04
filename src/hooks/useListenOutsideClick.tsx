@@ -1,5 +1,5 @@
 /*
-  Credit to https://stackoverflow.com/a/42234988https://stackoverflow.com/a/42234988 
+  Credit to https://stackoverflow.com/a/42234988
   for this approach.
 */
 

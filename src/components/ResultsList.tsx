@@ -14,6 +14,7 @@ export default function ResultsList({ results, onSelectResult }: ResultsListProp
         <div className="results-list">
             {results.map(result => (
                 <div
+                    key={JSON.stringify(result)}
                     onClick={() => onSelectResult(result)}
                     className="result-item" 
                     dangerouslySetInnerHTML={{__html: result.highlightedNode}} />
