@@ -33,30 +33,41 @@ export default function useAutoComplete({ fetchDataAsync }: AutoCompleteProps) {
     let [searchText, _setSearchText] = useState('');
     let [searchResults, setSearchResults] = useState([]);
     let latestReqTime = useRef<number>(getCurrentTime())
+    let debounceTimer = useRef(null);
+
+    async function fetchNewResults(newText: string) {
+        console.log(" Requesting for: ", newText)
+
+        try {
+            let requestedAt = getCurrentTime();
+            // update latestRequestedTime
+            if (requestedAt > latestReqTime.current) latestReqTime.current = requestedAt;
+            let searchResults = await fetchDataAsync(newText)
+
+            // check whether current response is the latest requested data
+            if (requestedAt < latestReqTime.current) {
+                // do nothing
+            } else {
+                // this request is the latest one issued
+                console.log("Setting results for: ", newText, searchResults)
+                let highlightedResults = highlightMatches(newText, searchResults)
+                setSearchResults(highlightedResults);
+            }
+        } catch(error) {
+            console.log("Search error. ", error)
+        }
+    }
 
     async function setSearchText(newText: string, shouldPerformSearch = true) {
         _setSearchText(newText)
 
-        if (shouldPerformSearch && newText) {
-            try {
-                let requestedAt = getCurrentTime();
-                // update latestRequestedTime
-                if (requestedAt > latestReqTime.current) latestReqTime.current = requestedAt;
-                let searchResults = await fetchDataAsync(newText)
-
-                // check whether current response is the latest requested data
-                if (requestedAt < latestReqTime.current) {
-                    // do nothing
-                } else {
-                    // this request is the latest one issued
-                    console.log("Setting results for: ", newText, searchResults)
-                    let highlightedResults = highlightMatches(newText, searchResults)
-                    setSearchResults(highlightedResults);
-                }
-            } catch(error) {
-                console.log("Search error. ", error)
+        if (shouldPerformSearch) {
+            if (newText) {
+                clearTimeout(debounceTimer.current)
+                debounceTimer.current = setTimeout(() => fetchNewResults(newText), 300) 
             }
         }
+
     }
 
     return { setSearchText, searchText, searchResults }
